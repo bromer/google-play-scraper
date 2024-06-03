@@ -32,7 +32,6 @@ def post(url: str, data: Union[str, bytes], headers: dict) -> str:
     for _ in range(MAX_RETRIES):
         try:
             headers['User-Agent'] = ua.random  # Add random User-Agent to headers
-            print("headers", headers)
             resp = _urlopen(Request(url, data=data, headers=headers))
         except Exception as e:
             last_exception = e
@@ -48,6 +47,5 @@ def post(url: str, data: Union[str, bytes], headers: dict) -> str:
 
 def get(url: str) -> str:
     headers = {'User-Agent': ua.random}  # Add random User-Agent to headers
-    print("headers", headers)
     return _urlopen(Request(url, headers=headers))
 
