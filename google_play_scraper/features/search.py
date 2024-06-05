@@ -43,13 +43,16 @@ def search(
         top_result = None
 
     success = False
+    tmp = dataset["ds:4"][0][1]
+
     # different idx for different countries and languages
-    for idx in range(len(dataset["ds:4"][0][1])):
-        try:
-            dataset = dataset["ds:4"][0][1][idx][22][0]
-            success = True
-        except Exception:
-            pass
+    if tmp:
+        for idx in range(len(tmp)):
+            try:
+                dataset = dataset["ds:4"][0][1][idx][22][0]
+                success = True
+            except Exception:
+                pass
     if not success:
         return []
 
