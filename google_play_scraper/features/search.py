@@ -53,6 +53,9 @@ def search(
     if not success:
         return []
 
+    if not dataset:
+        return []
+
     n_apps = min(len(dataset), n_hits)
 
     search_results = (
