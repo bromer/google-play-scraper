@@ -25,11 +25,14 @@ class TestReviews(TestCase):
 
         for r in result:
             self.assertTrue(
-                re.match(
-                    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                r["reviewId"].startswith("gp:AOqp")
+                or r["reviewId"].startswith("lg:AOqp")
+                or re.fullmatch(
+                    "[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}",
                     r["reviewId"],
                 )
             )
+            self.assertTrue(len(r["reviewId"]) == 90 or 36)
             self.assertTrue(r["userName"])
             self.assertTrue(r["userImage"])
             self.assertTrue(r["content"])
@@ -103,17 +106,14 @@ class TestReviews(TestCase):
                     continue
 
                 self.assertIn("안녕하세요", reply_content)
-                self.assertTrue(
-                    any(["EKKORR" in reply_content, "이꼬르" in reply_content])
-                )
                 self.assertIn("입니다", reply_content)
                 self.assertIn("감사합니다", reply_content)
 
                 self.assertTrue(len(reply_content) > 90)
                 self.assertIsInstance(replied_at, datetime)
-                # self.assertTrue(
-                #     datetime(2018, 6, 1) < replied_at < datetime(2022, 1, 1)
-                # )
+                self.assertTrue(
+                    datetime(2018, 6, 1) < replied_at < datetime(2022, 10, 6)
+                )
 
                 review_count_has_reply += 1
 

@@ -12,3 +12,7 @@ class Device(int, Enum):
     TABLET = 3
     CHROMEBOOK = 5
     TV = 6
+
+class PageType(int, Enum):
+    DEVELOPER = 1
+    COLLECTION = 2

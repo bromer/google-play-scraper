@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Any, Callable, List, Optional
-
 from google_play_scraper.utils import nested_lookup
 from google_play_scraper.utils.data_processors import unescape_text
 
@@ -151,29 +150,59 @@ class ElementSpecs:
         "comments": ElementSpec(
             8, [0], lambda container: [item[4] for item in container], []
         ),
-        # "editorsChoice": ElementSpec(5, [0, 12, 15, 0], bool, False),
-        # "similarApps": ElementSpec(
-        #     7,
-        #     [1, 1, 0, 0, 0],
-        #     lambda container: [container[i][12][0] for i in range(0, len(container))],
-        # ),
-        # "moreByDeveloper": [
-        #     ElementSpec(
-        #         9,
-        #         [0, 1, 0, 0, 0],
-        #         lambda container: [
-        #             container[i][12][0] for i in range(0, len(container))
-        #         ],
-        #     ),
-        #     ElementSpec(
-        #         9,
-        #         [0, 1, 0, 6, 0],
-        #         lambda container: [
-        #             container[i][12][0] for i in range(0, len(container))
-        #         ],
-        #     ),
-        # ],
+        "recentChanges": ElementSpec(5, [1, 2, 144, 1, 1], unescape_text),
+        "recentChangesHTML": ElementSpec(5, [1, 2, 144, 1, 1]),
+        # "editorsChoice": ElementSpec(4, [0, 12, 15, 0], bool, False),
+        "dataSafety": ElementSpec(
+            5,
+            [1, 2, 136, 1],
+            lambda container: [
+                {
+                    "section": ElementSpec(None, [1]).extract_content(container[i]),
+                    "summary": ElementSpec(None, [2, 1], None, None).extract_content(
+                        container[i]
+                    ),
+                }
+                for i in range(0, len(container))
+            ],
+        ),
+        "otherLanguages": ElementSpec(
+            3,
+            [0, 3],
+            lambda container: [container[i][0] for i in range(0, len(container))],
+        ),
     }
+
+    DetailHelper = {
+        "appCollections": ElementSpec(
+            6,
+            [1, 1],
+            lambda collections: [
+                {
+                    "title": ElementSpec(None, [21, 1, 0]).extract_content(collection),
+                    "appIds": [
+                        ElementSpec(None, [21, 0, i, 0, 0]).extract_content(collection)
+                        for i in range(0, len(collection[21][0]))
+                    ],
+                }
+                for collection in collections
+            ],
+        ),
+        "appCollectionPages": ElementSpec(
+            6,
+            [1, 1],
+            lambda collections: [
+                {
+                    "title": ElementSpec(None, [21, 1, 0]).extract_content(collection),
+                    "url": ElementSpec(None, [21, 1, 2, 4, 2]).extract_content(
+                        collection
+                    ),
+                }
+                for collection in collections
+            ],
+        ),
+    }
+
     Review = {
         "reviewId": ElementSpec(None, [0]),
         "userName": ElementSpec(None, [1, 0]),
@@ -239,4 +268,91 @@ class ElementSpecs:
         "descriptionHTML": ElementSpec(None, [0, 13, 1]),
         "developer": ElementSpec(None, [0, 14]),
         "installs": ElementSpec(None, [0, 15]),
+    }
+
+    DataSafety = {
+        "dataCollected": ElementSpec(
+            3,
+            [1, 2, 137, 4, 1, 0],
+            lambda collection: {
+                ElementSpec(None, [0, 1])
+                .extract_content(collection[i]): ElementSpec(
+                    None,
+                    [4],
+                    lambda entrys: [
+                        {
+                            "name": ElementSpec(None, [0]).extract_content(entrys[j]),
+                            "optional": ElementSpec(None, [1]).extract_content(
+                                entrys[j]
+                            ),
+                            "usage": ElementSpec(None, [2], None, None).extract_content(
+                                entrys[j]
+                            ),
+                        }
+                        for j in range(0, len(entrys))
+                    ],
+                )
+                .extract_content(collection[i])
+                for i in range(0, len(collection))
+            },
+        ),
+        "dataShared": ElementSpec(
+            3,
+            [1, 2, 137, 4, 0, 0],
+            lambda collection: {
+                ElementSpec(None, [0, 1])
+                .extract_content(collection[i]): ElementSpec(
+                    None,
+                    [4],
+                    lambda entrys: [
+                        {
+                            "name": ElementSpec(None, [0]).extract_content(entrys[j]),
+                            "optional": ElementSpec(None, [1]).extract_content(
+                                entrys[j]
+                            ),
+                            "usage": ElementSpec(None, [2], None, None).extract_content(
+                                entrys[j]
+                            ),
+                        }
+                        for j in range(0, len(entrys))
+                    ],
+                )
+                .extract_content(collection[i])
+                for i in range(0, len(collection))
+            },
+        ),
+        "securityPractices": ElementSpec(
+            3,
+            [1, 2, 137, 9, 2],
+            lambda container: [
+                {
+                    "name": ElementSpec(None, [i, 1]).extract_content(container),
+                    "description": ElementSpec(None, [i, 2, 1]).extract_content(
+                        container
+                    ),
+                }
+                for i in range(0, len(container))
+            ],
+        ),
+    }
+
+    Collection = {
+        "apps": ElementSpec(
+            3,
+            [0, 1, 0, 21, 0],
+            lambda collection: [
+                ElementSpec(None, [0, 0]).extract_content(entry) for entry in collection
+            ],
+        )
+    }
+
+    Developer = {
+        "apps": ElementSpec(
+            3,
+            [0, 1, 0, 21, 0],
+            lambda collection: [
+                ElementSpec(None, [0, 0]).extract_content(entry) for entry in collection
+            ],
+        )
+>>>>>>> cc14b1777ac274bd5535ca08d292d30b85565ede
     }
