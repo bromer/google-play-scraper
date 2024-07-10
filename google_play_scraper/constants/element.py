@@ -354,5 +354,4 @@ class ElementSpecs:
                 ElementSpec(None, [0, 0]).extract_content(entry) for entry in collection
             ],
         )
->>>>>>> cc14b1777ac274bd5535ca08d292d30b85565ede
     }
