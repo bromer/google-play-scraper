@@ -44,35 +44,41 @@ def parse_dom(dom: str, app_id: str, url: str) -> Dict[str, Any]:
         else:
             result[k] = content
 
-    for collection in ElementSpecs.DetailHelper["appCollections"].extract_content(
-        dataset
-    ):
-        if result["developer"] in collection["title"]:
-            result["moreByDeveloper"] = collection["appIds"]
-        else:
-            result["similarApps"] = collection["appIds"]
+    try:
+        for collection in ElementSpecs.DetailHelper["appCollections"].extract_content(
+            dataset
+        ):
+            if result["developer"] in collection["title"]:
+                result["moreByDeveloper"] = collection["appIds"]
+            else:
+                result["similarApps"] = collection["appIds"]
+    except:
+        pass
 
-    for page in ElementSpecs.DetailHelper["appCollectionPages"].extract_content(
-        dataset
-    ):
-        if result["developer"] in page["title"]:
-            result["moreByDeveloperPage"] = {
-                "token": page["url"][35:]
-                if page["url"].startswith("/store/apps/collection/cluster")
-                else page["url"][19:]
-                if page["url"].startswith("/store/apps/dev")
-                else page["url"],
-                "type": PageType.COLLECTION
-                if page["url"].startswith("/store/apps/collection/cluster")
-                else PageType.DEVELOPER
-                if page["url"].startswith("/store/apps/dev")
-                else None,
-            }
-        else:
-            result["similarAppsPage"] = {
-                "token": page["url"][35:],
-                "type": PageType.COLLECTION,
-            }
+    try:
+        for page in ElementSpecs.DetailHelper["appCollectionPages"].extract_content(
+            dataset
+        ):
+            if result["developer"] in page["title"]:
+                result["moreByDeveloperPage"] = {
+                    "token": page["url"][35:]
+                    if page["url"].startswith("/store/apps/collection/cluster")
+                    else page["url"][19:]
+                    if page["url"].startswith("/store/apps/dev")
+                    else page["url"],
+                    "type": PageType.COLLECTION
+                    if page["url"].startswith("/store/apps/collection/cluster")
+                    else PageType.DEVELOPER
+                    if page["url"].startswith("/store/apps/dev")
+                    else None,
+                }
+            else:
+                result["similarAppsPage"] = {
+                    "token": page["url"][35:],
+                    "type": PageType.COLLECTION,
+                }
+    except:
+        pass
 
     result["appId"] = app_id
     result["url"] = url
